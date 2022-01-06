@@ -4,7 +4,6 @@
     "paths": {
       "@/*": ["src/*"]
     },
-    "typeRoots": ["typings"],
     "target": "es5",
     "allowJs": true,
     "skipLibCheck": true,
@@ -20,6 +19,5 @@
     "jsx": "preserve",
     "noImplicitAny": false
   },
-  "include": ["src"],
-  "exclude": ["src/**/*.less"]
+  "include": ["src"]
 }

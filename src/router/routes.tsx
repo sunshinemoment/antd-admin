@@ -1,5 +1,9 @@
 import { lazy } from "react";
-import { lazyload, RouteConfig, generateRoutes } from "./helper";
+import {
+  lazyload,
+  RouteConfig,
+  generateRoutesAndEnhanceRoutes,
+} from "./helper";
 const BasicList = lazy(() => import("@/pages/list/basic-list"));
 const TableList = lazy(() => import("@/pages/list/table-list"));
 
@@ -22,4 +26,4 @@ export const routes: RouteConfig[] = [
   },
 ];
 
-export default generateRoutes(routes);
+export default generateRoutesAndEnhanceRoutes(routes);

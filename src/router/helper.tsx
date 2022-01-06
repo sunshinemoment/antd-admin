@@ -9,13 +9,17 @@ export interface RouteConfig {
   path?: string;
 
   name?: string;
+  realPath?: String;
 }
 
 export const lazyload = (children: ReactNode): ReactNode => {
   return <Suspense fallback={<>loading</>}>{children}</Suspense>;
 };
 
-export const generateRoutes = (routes): RouteObject[] => {
+export const generateRoutesAndEnhanceRoutes = (
+  routes,
+  parent?
+): RouteObject[] => {
   return routes.reduce((pre, route) => {
     const currentRoute: RouteObject = {};
     if (route.caseSensitive !== undefined) {
@@ -29,9 +33,21 @@ export const generateRoutes = (routes): RouteObject[] => {
     }
     if (route.path !== undefined) {
       currentRoute.path = route.path;
+
+      if (parent?.path) {
+        route.realPath = parent.path + "/" + route.path;
+      } else {
+        route.realPath = route.path;
+      }
+      if (!route.path.startsWith("/")) {
+        route.realPath = "/" + route.realPath;
+      }
     }
     if (route.children !== undefined) {
-      currentRoute.children = generateRoutes(route.children);
+      currentRoute.children = generateRoutesAndEnhanceRoutes(
+        route.children,
+        route
+      );
       if (route.children[0].element) {
         currentRoute.children.unshift({
           index: true,

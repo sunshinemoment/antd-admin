@@ -2,7 +2,7 @@ import { RouteObject, Navigate } from "react-router-dom";
 import AppLayout from "@/layouts/app-layout";
 import appRoutes from "./routes";
 
-const routes: RouteObject[] = [
+const router: RouteObject[] = [
   {
     path: "/",
     element: <AppLayout />,
@@ -16,4 +16,4 @@ const routes: RouteObject[] = [
   },
 ];
 
-export default routes;
+export default router;
