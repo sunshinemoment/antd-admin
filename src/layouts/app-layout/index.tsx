@@ -44,9 +44,9 @@ const BasicLayout = () => {
           {getNavMenuItems(routes)}
         </Menu>
       </Sider>
-      <Layout>
+      <Layout className={styles.main}>
         <Header className={styles.header}>Header</Header>
-        <Content>
+        <Content className={styles.content}>
           <Outlet></Outlet>
         </Content>
         <Footer>Footer</Footer>

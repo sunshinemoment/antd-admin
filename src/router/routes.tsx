@@ -4,8 +4,8 @@ import {
   RouteConfig,
   generateRoutesAndEnhanceRoutes,
 } from "./helper";
-const BasicList = lazy(() => import("@/pages/list/basic-list"));
 const TableList = lazy(() => import("@/pages/list/table-list"));
+const BasicList = lazy(() => import("@/pages/list/basic-list"));
 
 export const routes: RouteConfig[] = [
   {
@@ -15,12 +15,12 @@ export const routes: RouteConfig[] = [
       {
         path: "table-list",
         name: "查询列表",
-        element: lazyload(<BasicList />),
+        element: lazyload(<TableList />),
       },
       {
         path: "basic-list",
         name: "标准列表",
-        element: lazyload(<TableList />),
+        element: lazyload(<BasicList />),
       },
     ],
   },
