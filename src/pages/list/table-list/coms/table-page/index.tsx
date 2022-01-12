@@ -1,154 +1,136 @@
-import { useReducer } from "react";
+import {
+  useState,
+  useReducer,
+  useEffect,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import { Card, Table, Tag, Space, Popconfirm } from "antd";
-import { TableProps } from "antd/lib/table";
 import { PaginationProps } from "antd/lib/pagination";
 import { RecordType, Query } from "../../types";
 import { generateData } from "../../mock";
+import { TablePageProps, TablePageHandle } from "./types";
+import { initialState, reducer } from "./config";
 
-// interface TablePageState {
-//   loading: boolean;
-//   dataSource: RecordType[];
-//   pagination: PaginationProps;
-// }
+const TablePage = forwardRef<TablePageHandle, TablePageProps<RecordType>>(
+  (props, ref) => {
+    const [state, dispatch] = useReducer(reducer, initialState);
+    const [query, setQuery] = useState({});
 
-interface TablePageProps<T> extends TableProps<T> {
-  onChange?: (pagination: PaginationProps) => void;
-  onEdit?: (record: RecordType) => void;
-  onDelete?: (record: RecordType) => void;
-}
+    useImperativeHandle(ref, () => ({
+      search,
+    }));
 
-// type ReducerAction =
-//   | {
-//       type: "loading";
-//     }
-//   | {
-//       type: "reslove";
-//     }
-//   | {
-//       type: "reject";
-//     };
+    const columns = [
+      {
+        title: "Name",
+        dataIndex: "name",
+        key: "name",
+        render: (text) => <a>{text}</a>,
+      },
+      {
+        title: "Age",
+        dataIndex: "age",
+        key: "age",
+      },
+      {
+        title: "Address",
+        dataIndex: "address",
+        key: "address",
+      },
+      {
+        title: "Tags",
+        key: "tags",
+        dataIndex: "tags",
+        render: (tags) => (
+          <>
+            {tags.map((tag) => {
+              let color = tag.length > 5 ? "geekblue" : "green";
+              if (tag === "loser") {
+                color = "volcano";
+              }
+              return (
+                <Tag color={color} key={tag}>
+                  {tag.toUpperCase()}
+                </Tag>
+              );
+            })}
+          </>
+        ),
+      },
+      {
+        title: "Action",
+        key: "action",
+        render: (text, record) => (
+          <Space size="middle">
+            <a onClick={() => props.onEdit?.(record)}>Edit</a>
+            <Popconfirm
+              title="Are you sure to delete?"
+              onConfirm={() => props.onDelete?.(record)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <a>Delete</a>
+            </Popconfirm>
+          </Space>
+        ),
+      },
+    ];
 
-// const initialState: TablePageState = {
-//   loading: false,
-//   dataSource: [],
-//   pagination: {
-//     current: 1,
-//     pageSize: 10,
-//     total: 0,
-//   },
-// };
+    function search(params: Query) {
+      const { current, pageSize, ...query } = params;
+      fetchData(params);
+      setQuery(query);
+    }
 
-// function reducer(state: TablePageState, action: ReducerAction): TablePageState {
-//   switch (action.type) {
-//     case "loading":
-//       return {
-//         ...state,
-//         loading: true,
-//       };
-//     case "reslove":
-//       return {
-//         ...state,
-//         dataSource: state.dataSource,
-//         pagination: state.pagination,
-//       };
-//     case "reject":
-//       return {
-//         ...state,
-//         ...initialState,
-//       };
-//     default:
-//       return initialState;
-//   }
-// }
+    function fetchData(params: Query) {
+      generateData({
+        current: state.pagination.current,
+        pageSize: state.pagination.pageSize,
+        ...query,
+        ...params,
+      })
+        .then((payload) => {
+          dispatch({
+            type: "reslove",
+            payload,
+          });
+        })
+        .catch((payload) => {
+          dispatch({
+            type: "reject",
+            payload,
+          });
+        })
+        .finally(() => {
+          dispatch({
+            type: "finish",
+          });
+        });
+    }
 
-const TablePage = (props: TablePageProps<RecordType>) => {
-  // const [state, dispatch] = useReducer(reducer, initialState);
+    useEffect(() => {
+      fetchData({
+        current: 1,
+        pageSize: 10,
+      });
+    }, []);
 
-  const columns = [
-    {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-      render: (text) => <a>{text}</a>,
-    },
-    {
-      title: "Age",
-      dataIndex: "age",
-      key: "age",
-    },
-    {
-      title: "Address",
-      dataIndex: "address",
-      key: "address",
-    },
-    {
-      title: "Tags",
-      key: "tags",
-      dataIndex: "tags",
-      render: (tags) => (
-        <>
-          {tags.map((tag) => {
-            let color = tag.length > 5 ? "geekblue" : "green";
-            if (tag === "loser") {
-              color = "volcano";
-            }
-            return (
-              <Tag color={color} key={tag}>
-                {tag.toUpperCase()}
-              </Tag>
-            );
-          })}
-        </>
-      ),
-    },
-    {
-      title: "Action",
-      key: "action",
-      render: (text, record) => (
-        <Space size="middle">
-          <a onClick={() => props.onEdit?.(record)}>Edit</a>
-          <Popconfirm
-            title="Are you sure to delete?"
-            onConfirm={() => props.onDelete?.(record)}
-            okText="Yes"
-            cancelText="No"
-          >
-            <a>Delete</a>
-          </Popconfirm>
-        </Space>
-      ),
-    },
-  ];
-
-  // function fetchData(params: Query) {
-  //   generateData({
-  //     current: params.current,
-  //     pageSize: pagination.pageSize,
-  //     ...params,
-  //   })
-  //     .then((data) => {
-  //       setDataSource(data.dataSource);
-  //       setPagination(data.pagination);
-  //     })
-  //     .finally(() => {
-  //       setLoading(false);
-  //     });
-  // }
-
-  const onChange = (pagination) => {
-    props.onChange?.(pagination);
-  };
-  return (
-    <Card bordered={false}>
-      <Table
-        loading={props.loading}
-        columns={columns}
-        dataSource={props.dataSource}
-        onChange={onChange}
-        pagination={props.pagination}
-      />
-    </Card>
-  );
-};
+    const onChange = ({ current, pageSize }: PaginationProps) => {
+      fetchData({ current, pageSize });
+    };
+    return (
+      <Card bordered={false}>
+        <Table
+          loading={state.loading}
+          columns={columns}
+          dataSource={state.dataSource}
+          onChange={onChange}
+          pagination={state.pagination}
+        />
+      </Card>
+    );
+  }
+);
 
 export default TablePage;

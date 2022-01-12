@@ -15,7 +15,13 @@ export interface RecordType {
  * 异步获取列表结果
  */
 export interface Result {
+  /**
+   * 数据列表
+   */
   dataSource: RecordType[];
+  /**
+   * 分页数据
+   */
   pagination: PaginationProps;
 }
 
